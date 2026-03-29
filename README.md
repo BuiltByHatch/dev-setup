@@ -12,15 +12,16 @@ Scripts for setting up a development environment.
 ### macOS / Linux
 
 ```bash
-chmod +x setup.sh
-./setup.sh
+curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/dev-setup/main/setup.sh | bash
 ```
 
 ### Windows
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File setup.ps1
+irm 'https://raw.githubusercontent.com/YOUR_USERNAME/dev-setup/main/setup.ps1' | iex
 ```
+
+Replace `YOUR_USERNAME` with your GitHub username.
 
 ## What's Installed
 
