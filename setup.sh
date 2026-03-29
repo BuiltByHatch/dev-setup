@@ -5,6 +5,26 @@ INSTALLED=()
 ALREADY_INSTALLED=()
 FAILED=()
 
+echo "========================================"
+echo "       DEV SETUP INSTALLER"
+echo "========================================"
+echo ""
+echo "This script will install the following:"
+echo "  - Git         (version control)"
+echo "  - Homebrew    (macOS package manager, if needed)"
+echo "  - OpenCode    (AI coding assistant)"
+echo "  - Cursor      (AI-powered IDE)"
+echo ""
+echo "========================================"
+printf "Proceed with installation? [Y/n]: "
+read -r response
+response=${response:-Y}
+if [[ ! "$response" =~ ^[Yy]$ ]]; then
+    echo "Installation cancelled."
+    exit 0
+fi
+
+echo ""
 echo "Setting up development environment..."
 
 # Install package managers if needed

@@ -5,6 +5,24 @@ $INSTALLED = @()
 $ALREADY_INSTALLED = @()
 $FAILED = @()
 
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "       DEV SETUP INSTALLER" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "This script will install the following:"
+Write-Host "  - Git         (version control)"
+Write-Host "  - winget      (Windows package manager, if needed)"
+Write-Host "  - OpenCode    (AI coding assistant)"
+Write-Host "  - Cursor      (AI-powered IDE)"
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+$response = Read-Host "Proceed with installation? [Y/n]"
+if ($response -notlike "Y" -and $response -notlike "y" -and $response -ne "") {
+    Write-Host "Installation cancelled." -ForegroundColor Yellow
+    exit 0
+}
+
+Write-Host ""
 Write-Host "Setting up development environment..." -ForegroundColor Cyan
 
 # Install package managers if needed
