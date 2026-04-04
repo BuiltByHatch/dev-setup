@@ -5,6 +5,21 @@ $INSTALLED = @()
 $ALREADY_INSTALLED = @()
 $FAILED = @()
 
+$TASKS = @(
+    "Checking package manager"
+    "Installing winget"
+    "Installing Git"
+    "Installing OpenCode"
+    "Installing Cursor"
+)
+$TOTAL_TASKS = $TASKS.Count
+$CURRENT_TASK = 0
+
+function Show-Progress {
+    param([int]$Percent, [string]$Status)
+    Write-Progress -Activity "Dev Setup Installation" -Status $Status -PercentComplete $Percent
+}
+
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "       DEV SETUP INSTALLER" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
@@ -24,10 +39,13 @@ if ($response -notlike "Y" -and $response -notlike "y" -and $response -ne "") {
 
 Write-Host ""
 Write-Host "Setting up development environment..." -ForegroundColor Cyan
+Write-Host ""
+
+$CURRENT_TASK = 1
+Show-Progress -Percent (($CURRENT_TASK / $TOTAL_TASKS) * 100) -Status $TASKS[$CURRENT_TASK - 1]
 
 # Install package managers if needed
 if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing winget..." -ForegroundColor Yellow
     if (Get-Command choco -ErrorAction SilentlyContinue) {
         Write-Host "Chocolatey detected, using it instead"
     } else {
@@ -38,10 +56,11 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
     $ALREADY_INSTALLED += "winget"
 }
 
+$CURRENT_TASK = 2
+Show-Progress -Percent (($CURRENT_TASK / $TOTAL_TASKS) * 100) -Status $TASKS[$CURRENT_TASK - 1]
+
 # Install Git if not present
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing Git..." -ForegroundColor Yellow
-    
     if (Get-Command winget -ErrorAction SilentlyContinue) {
         winget install Git.Git --accept-source-agreements --accept-package-agreements
         if ($?) { $INSTALLED += "Git" } else { $FAILED += "Git" }
@@ -56,10 +75,11 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     $ALREADY_INSTALLED += "Git"
 }
 
+$CURRENT_TASK = 3
+Show-Progress -Percent (($CURRENT_TASK / $TOTAL_TASKS) * 100) -Status $TASKS[$CURRENT_TASK - 1]
+
 # Install OpenCode
 if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing OpenCode..." -ForegroundColor Yellow
-    
     try {
         $installScript = Invoke-WebRequest -Uri "https://opencode.ai/install" -UseBasicParsing
         Invoke-Expression $installScript.Content
@@ -71,9 +91,11 @@ if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
     $ALREADY_INSTALLED += "OpenCode"
 }
 
+$CURRENT_TASK = 4
+Show-Progress -Percent (($CURRENT_TASK / $TOTAL_TASKS) * 100) -Status $TASKS[$CURRENT_TASK - 1]
+
 # Install Cursor
 if (-not (Get-Command cursor -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing Cursor..." -ForegroundColor Yellow
     try {
         Invoke-WebRequest -Uri "https://cursor.com/install?win32=true" -UseBasicParsing | Invoke-Expression
         $INSTALLED += "Cursor"
@@ -83,6 +105,11 @@ if (-not (Get-Command cursor -ErrorAction SilentlyContinue)) {
 } else {
     $ALREADY_INSTALLED += "Cursor"
 }
+
+$CURRENT_TASK = 5
+Show-Progress -Percent (($CURRENT_TASK / $TOTAL_TASKS) * 100) -Status $TASKS[$CURRENT_TASK - 1]
+Write-Host ""
+Write-Host ""
 
 # Summary
 Write-Host ""

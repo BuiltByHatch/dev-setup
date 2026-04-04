@@ -5,6 +5,36 @@ INSTALLED=()
 ALREADY_INSTALLED=()
 FAILED=()
 
+TASKS=(
+    "Checking package manager"
+    "Installing Homebrew"
+    "Installing Git"
+    "Installing OpenCode"
+    "Installing Cursor"
+)
+TOTAL_TASKS=${#TASKS[@]}
+CURRENT_TASK=0
+
+draw_progress_bar() {
+    local progress=$1
+    local task_name=$2
+    local width=40
+    local filled=$((width * progress / 100))
+    local empty=$((width - filled))
+    
+    printf "\r[%s%s] %3d%% | %-30s" \
+        "$(printf '#%.0s' $(seq 1 $filled 2>/dev/null) 2>/dev/null || echo "")" \
+        "$(printf '.%.0s' $(seq 1 $empty 2>/dev/null) 2>/dev/null || echo "")" \
+        "$progress" \
+        "$task_name"
+}
+
+update_progress() {
+    CURRENT_TASK=$((CURRENT_TASK + 1))
+    local progress=$((CURRENT_TASK * 100 / TOTAL_TASKS))
+    draw_progress_bar "$progress" "${TASKS[$((CURRENT_TASK - 1))]}"
+}
+
 echo "========================================"
 echo "       DEV SETUP INSTALLER"
 echo "========================================"
@@ -26,10 +56,12 @@ fi
 
 echo ""
 echo "Setting up development environment..."
+echo ""
+
+update_progress
 
 # Install package managers if needed
 install_homebrew() {
-    echo "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 
@@ -55,9 +87,10 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     fi
 fi
 
+update_progress
+
 # Install Git if not present
 if ! command -v git &> /dev/null; then
-    echo "Installing Git..."
     if command -v brew &> /dev/null; then
         brew install git && INSTALLED+=("Git") || FAILED+=("Git")
     elif command -v apt-get &> /dev/null; then
@@ -72,21 +105,27 @@ else
     ALREADY_INSTALLED+=("Git")
 fi
 
+update_progress
+
 # Install OpenCode
 if ! command -v opencode &> /dev/null; then
-    echo "Installing OpenCode..."
     curl -fsSL https://opencode.ai/install | bash && INSTALLED+=("OpenCode") || FAILED+=("OpenCode")
 else
     ALREADY_INSTALLED+=("OpenCode")
 fi
 
+update_progress
+
 # Install Cursor
 if ! command -v cursor &> /dev/null; then
-    echo "Installing Cursor..."
     curl https://cursor.com/install -fsS | bash && INSTALLED+=("Cursor") || FAILED+=("Cursor")
 else
     ALREADY_INSTALLED+=("Cursor")
 fi
+
+update_progress
+echo ""
+echo ""
 
 # Summary
 echo ""
